@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Lab_Activity5",
+            "request": "launch",
+            "mainClass": "Lab_Activity5",
+            "projectName": "Java_85720fd"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "console": "externalTerminal",
