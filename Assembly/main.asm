@@ -4,28 +4,31 @@ dosseg
 .data
 
 .code
-    start:
+start:
     mov ax, @data    ;to read .data section 
     mov ds, ax
 
-    mov ah, 2       ;request character
-    mov dl, '9'     ;display variable 
-
-    mov cx, 9           ;number of loops
-    l1: 
+    mov cx, 5
+    row:
         push cx         ;store cx in top stack 
-        l2: ; 87654321 cx=0
+
+        mov ah, 2       ;request character
+        mov dl,'a'      ;display character
+        
+        mov cx,5
+        column:
             int 21h     ;print variable 
-        loop l2
-        mov bl, dl      ;temporary put dl variable to bl `
+        loop column
+     
         mov dl, 10     ;we can now use dl to nextline 
         int 21h         ;printnextline
         mov dl, bl       ;transfer back bl to dl
-
-        dec dl           ;decrement dl variable
+        
         pop cx           ;retrieve the current data from top stack 
-    loop l1 
+    loop row
 
     mov ax, 4c00h   ;to end the code 
     int 21h
-    end start 
+end start
+
+
