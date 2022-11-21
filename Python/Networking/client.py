@@ -10,8 +10,6 @@ print("Connecting to {} port {}".format(*server_address))
 sock.connect(server_address)
 
 try:
-
-    # Send data
     message = b'Ito yung message'
     #print("sending {!r}".format(message))
     print("sending ", str(message))

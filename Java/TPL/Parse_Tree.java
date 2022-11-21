@@ -1,158 +1,147 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Parse_Tree {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-        System.out.print("Enter Expression: ");
-        String input = in.nextLine();
-        in.close();
-        System.out.println(result(input));
+        String input = "int x = 1 + 1 + 1 + 1 ;";
+        System.out.println(parser(input));
 
     }
 
-    public static String result(String input) {
-        String expression = "+-%/*";
-        String[] specific = input.split(" ");
+    public static String parser(String input) {
         String result = "";
-        for (int i = 0;;) {
-            if (specific[i].equals("int")) {
-                if (specific[2].equals("=") && specific[specific.length - 1].equals(";")
-                        && !expression.contains(specific[specific.length - 2])
-                        && !specific[specific.length - 2].equals("=")) {
-                    System.out.println("         <assign>         ");
-                    System.out.println("         /      \\          ");
-                    System.out.println("<data_type>      <identifier> =   <value>");
-                    System.out.println("     |\t\t\t|\t /      \\");
-                    System.out.print("    " + specific[0] + "\t\t\t" + specific[1]);
-                    String[] element = new String[specific.length];
-                    for (int j = 3; j < element.length; j++) {
-                        element[j] = specific[j];
-                    }
 
-                    boolean validNum = false;
-                    boolean validExpr = false;
-                    for (int j = 3; j < element.length; j++) {
-                        char[] elemChar = element[j].toCharArray();
-                        for (char c : elemChar) {
-                            if (Character.isDigit(c)) {
-                                validNum = true;
-                            } else {
-                                validNum = false;
-                            }
-                        }
-                        try {
-                            while (element[j + 1] != null) {
-                                if (expression.contains(element[j + 1])) {
-                                    validExpr = true;
-                                    break;
-                                } else {
-                                    validExpr = false;
-                                    break;
-                                }
-                            }
-                            List<String> temp = new ArrayList<>();
-                            String output = "";
-                            if (validNum == true && validExpr == true) {
-                                if (j == 3) {
-                                    output += ("\t" + element[j] + "\t<expression>");
-                                    output += ("\n" + addSpaces() + "/     \\");
-                                    temp.add(output);
-                                    output = "";
-                                } else {
-                                    output += (addSpaces() + element[j] + "\t<expression>\n");
-                                    output += ("\n" + addSpaces() + "/     \\");
-                                    temp.add(output);
-                                    output = "";
-                                }
-                            } else if (validNum = true && validExpr == false && element[j + 1].equals(";")) {
-                                output += (addSpaces() + element[j] + "\t<delimiter>");
-                                output += ("\n" + addSpaces() + ";");
-                                temp.add(output);
-                                output = "";
-                            } else if (validNum == false && validExpr == false) {
-                                output += (addSpaces() + element[j] + "\t<value>");
-                                output += ("\n" + addSpaces() + "/     \\");
-                                temp.add(output);
-                                output = "";
-                            }
-                            for (String string : temp) {
-                                System.out.println(string);
-                            }
-                        } catch (Exception e) {
-                        }
-                    }
-                    System.out.println();
-                    result = "Semantically Correct!";
-                    break;
-                } else {
-                    result = "Semantically Incorrect!";
-                    break;
-                }
-            } else if (specific[i].equals("double")) {
-                if (specific[2].equals("=") && specific[specific.length - 1].equals(";")) {
-                    char[] chars = specific[3].toCharArray();
-                    boolean num = false;
-                    for (char c : chars) {
-                        if (Character.isDigit(c)) {
-                            num = true;
-                        }
-                    }
-                    if (num == true && specific[3].contains(".")) {
-                        result = "Semantically correct!";
-                    }
-                    break;
-                } else {
-                    result = "Semantically Incorrect!";
-                    break;
-                }
-            } else if (specific[i].equals("String")) {
-                if (specific[2].equals("=")
-                        && Character.toString(specific[3].charAt(0)).equals("\"")
-                        && Character.toString(
-                                specific[specific.length - 2].charAt(specific[specific.length - 2].length() - 1))
-                                .equals("\"")
-                        && specific[specific.length - 1].equals(";")) {
-                    result = "Semantically Correct!";
-                    break;
-                } else {
-                    result = "Semantically Incorrect!";
-                    break;
-                }
-            } else if (specific[i].equals("char")) {
-                if (specific[2].equals("=")
-                        && (Character.toString(specific[3].charAt(0)).equals("\'")
-                                && Character.toString(specific[3].charAt(2)).equals("\'")
-                                || specific[3].length() == 1)
-                        && specific[specific.length - 1].equals(";")) {
+        String[] data_types = { "int", "double" };
+        String[] operators = { "+", "-", "*", "/" };
 
-                    result = "Semantically Correct!";
-                    break;
-                } else {
-                    result = "Semantically Incorrect!";
-                    break;
+        String[] splitted = input.trim().split(" ");
+        int len = splitted.length;
+
+        String[] row = new String[len * 2];
+        for (int i = 0; i < len * 2; i++) {
+            row[i] = "";
+        }
+
+        int rowcurr = 0;
+        int indent = 0;
+
+        for (int i = 0; i < len; i++) {
+            String current = splitted[i];
+
+            if (current.equals("")) {
+                continue;
+            }
+            if (current.equals(";")) {
+                if (row[rowcurr + 2].equals("")) {
+                    row[rowcurr + 1] += repeat(" ", indent);
+                    row[rowcurr + 2] += repeat(" ", indent);
                 }
-            } else if (specific[i].equals("boolean")) {
-                String bol = "true True TRUE false False FALSE";
-                if (specific[2].equals("=") && bol.contains(specific[3])
-                        && specific[specific.length - 1].equals(";")) {
-                    result = "Semantically Correct!";
-                    break;
-                } else {
-                    result = "Semantically Incorrect!";
-                    break;
+
+                String stri2 = "<delimiter>";
+                int leng = stri2.length();
+                row[rowcurr] += centerthis(stri2, leng);
+                row[rowcurr + 1] += centerthis("|", leng);
+                row[rowcurr + 2] += centerthis(current, leng);
+                rowcurr += 3;
+            } else if (current.equals("=")) {
+                row[rowcurr] += "=";
+                row[rowcurr + 1] += " ";
+                row[rowcurr + 2] += " ";
+            } else if (isIn(current, data_types)) {
+                String stri2 = "<data_type>";
+                rowcurr += 2;
+                row[rowcurr - 2] += centerthis("<assign>", stri2.length() * 2 + 3);
+                row[rowcurr - 1] += centerthis("/      \\", stri2.length() * 2 + 3);
+                row[rowcurr] += centerthis(stri2, stri2.length() + 3);
+                row[rowcurr + 1] += centerthis("|", stri2.length() + 3);
+                row[rowcurr + 2] += centerthis(current, stri2.length() + 3);
+            } else if (isIn(current, operators)) {
+                if (row[rowcurr + 2].equals("")) {
+                    row[rowcurr + 1] += repeat(" ", indent);
+                    row[rowcurr + 2] += repeat(" ", indent);
                 }
+
+                String stri2 = "<expression>";
+                int leng = stri2.length();
+                row[rowcurr] += centerthis(stri2, leng * 2);
+                row[rowcurr + 1] += centerthis("/", leng) +
+                        centerthis("\\", leng);
+                row[rowcurr + 2] += centerthis(current, leng);
+
+                rowcurr += 2;
+                indent = row[rowcurr].length();
+            } else if (isNumeric(current)) {
+                if (row[rowcurr + 2].equals("")) {
+                    row[rowcurr + 1] += repeat(" ", indent);
+                    row[rowcurr + 2] += repeat(" ", indent);
+                }
+
+                String stri2 = "<value>";
+                int leng = stri2.length();
+                row[rowcurr] += centerthis(stri2, leng * 2);
+                row[rowcurr + 1] += centerthis("/", leng) +
+                        centerthis("\\", leng);
+                row[rowcurr + 2] += centerthis(current, leng);
+
+                rowcurr += 2;
+                indent = row[rowcurr].length();
+            } else if (isAlphaNumeric(current)) {
+                String stri2 = "<identifier>";
+                row[rowcurr] += centerthis(stri2, stri2.length() + 3);
+                row[rowcurr + 1] += centerthis("|", stri2.length() + 3);
+                row[rowcurr + 2] += centerthis(current, stri2.length() + 3);
             } else {
-                result = "Semantically Incorrect!";
-                break;
+                return "Not Semantics";
             }
         }
+
+        for (int i = 0; i < rowcurr; i++) {
+            result += row[i] + "\n";
+        }
+
         return result;
     }
 
-    public static String addSpaces() {
-        String addedTab = "                            ";
-        return addedTab;
+    public static boolean isIn(String search, String[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (search.equals(array[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNumeric(String string) {
+        int intValue;
+        if (string == null || string.equals("")) {
+            return false;
+        }
+
+        try {
+            intValue = Integer.parseInt(string);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isAlphaNumeric(String s) {
+        return s != null && s.matches("^[a-zA-Z0-9]*$");
+    }
+
+    public static String centerthis(String str, int spacing) {
+        int count = spacing - str.length();
+
+        return (repeat(" ", count / 2)
+                + str +
+                repeat(" ", (count / 2) + count % 2));
+    }
+
+    public static String repeat(String str, int count) {
+        String result = "";
+        for (int i = 0; i < count; i++) {
+            result += str;
+        }
+        return result;
     }
 }
